@@ -26,7 +26,10 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [{ src: '~/plugins/amplify.js', ssr: false }],
+  plugins: [
+    { src: '~/plugins/amplify.js', ssr: false },
+    { src: '~/plugins/vue2-google-maps.js' }
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -46,7 +49,7 @@ export default {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken2,
@@ -62,5 +65,9 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    extend(config, ctx) {},
+    vendor: ['vue2-google-maps'],
+    transpile: [/^vue2-google-maps($|\/)/]
+  },
 }

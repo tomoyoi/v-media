@@ -1,14 +1,20 @@
 <template>
   <amplify-authenticator>
-    <h1>TodoApp</h1>
-    <v-text-field v-model="name" label="Name"></v-text-field>
-    <v-text-field v-model="description" label="Description"></v-text-field>
-    <v-btn @click="createTodo">Create</v-btn>
-    <ul>
-      <li v-for="todo in todos" :key="todo.id">
-        {{ todo.name }} : {{ todo.description }}
-      </li>
-    </ul>
+    <h1>ビーガンレシピ検索</h1>
+    <v-row justify="center" align="center">
+      <v-col cols="12" sm="8" md="6">
+        <v-card>
+          <GmapMap
+            map-type-id="roadmap"
+            :center="maplocation"
+            :zoom="zoom"
+            :style="styleMap"
+            :options="mapOptions"
+          >
+          </GmapMap>
+        </v-card>
+      </v-col>
+    </v-row>
     <amplify-sign-out></amplify-sign-out>
   </amplify-authenticator>
 </template>
@@ -23,25 +29,46 @@ export default {
   data() {
     return {
       name: '',
-      description: '',
       todos: [],
+      maplocation: { lng: 0, lat: 0 },
+      zoom: 4,
+      styleMap: {
+        width: '100%',
+        height: '400px',
+      },
+      mapOptions: {
+        streetViewControl: false,
+        styles: [],
+      },
     }
   },
   created() {
     this.getTodos()
     this.subscribe()
   },
+  async mounted() {
+    const currentPosTmp = await this.getCurrentPosition()
+    const currentPos = {
+      lat: currentPosTmp.coords.latitude,
+      lng: currentPosTmp.coords.longitude,
+    }
+    this.maplocation = currentPos
+  },
   methods: {
+    getCurrentPosition() {
+      return new Promise(function (resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject)
+      })
+    },
     async createTodo() {
-      const { name, description } = this
-      if (!name || !description) return false
-      const todo = { name, description }
+      const { name } = this
+      if (!name) return false
+      const todo = { name }
       await API.graphql({
         query: createTodo,
         variables: { input: todo },
       })
       this.name = ''
-      this.description = ''
     },
     async getTodos() {
       const todos = await API.graphql({
@@ -53,7 +80,7 @@ export default {
       API.graphql({ query: onCreateTodo }).subscribe({
         next: (eventData) => {
           const todo = eventData.value.data.onCreateTodo
-          if (this.todos.some((item) => item.name === todo.name)) return // remove duplications
+          if (this.todos.some((item) => item.name === todo.name)) return
           this.todos = [...this.todos, todo]
         },
       })
