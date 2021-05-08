@@ -72,19 +72,39 @@ export default {
       items: [
         {
           icon: 'mdi-apps',
-          title: 'Welcome',
+          title: 'HOME',
           to: '/',
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
+          icon: 'mdi-silverware',
+          title: 'レストランマップ',
+          to: '/RestaurantMap',
+        },
+        {
+          icon: 'mdi-playlist-edit',
+          title: 'レストランリスト',
+          to: '/RestaurantList',
+        },
+        {
+          icon: 'mdi-chef-hat',
+          title: 'ビーガンクッキング',
+          to: '/Recipe',
+        },
+        {
+          icon: 'mdi-book-open-page-variant-outline',
+          title: 'おすすめな本',
+          to: '/Book',
+        },
+        {
+          icon: 'mdi-head-dots-horizontal-outline',
+          title: '著者の回想',
+          to: '/Dairy',
         },
       ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'ぶいメディア',
+      title: 'vメディア',
     }
   },
 }
