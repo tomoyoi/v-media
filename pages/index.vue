@@ -1,16 +1,36 @@
 <template>
   <amplify-authenticator>
-    <h1>ビーガンレシピ検索</h1>
+    <h1>サンプル</h1>
     <v-row justify="center" align="center">
       <v-col cols="12" sm="8" md="6">
         <v-card>
           <GmapMap
+            ref="gmp"
             map-type-id="roadmap"
             :center="maplocation"
             :zoom="zoom"
             :style="styleMap"
             :options="mapOptions"
           >
+            <GmapMarker
+              v-for="(m, index) in markers"
+              :key="index"
+              :title="m.title"
+              :position="m.position"
+              :clickable="true"
+              :draggable="false"
+              @click="onClickMarker(index, m)"
+            />
+            <GmapInfoWindow
+              :options="infoOptions"
+              :position="infoWindowPos"
+              :opened="infoWinOpen"
+              @closeclick="infoWinOpen = false"
+            >
+              <p style="color: #000">
+                {{ marker.title }}
+              </p>
+            </GmapInfoWindow>
           </GmapMap>
         </v-card>
       </v-col>
@@ -20,31 +40,37 @@
 </template>
 
 <script>
-import { API } from 'aws-amplify'
-import { createTodo } from '~/src/graphql/mutations'
-import { listTodos } from '~/src/graphql/queries'
-import { onCreateTodo } from '~/src/graphql/subscriptions'
-
 export default {
   data() {
     return {
-      name: '',
-      todos: [],
       maplocation: { lng: 0, lat: 0 },
       zoom: 4,
       styleMap: {
         width: '100%',
         height: '400px',
+        margin: '40px',
       },
       mapOptions: {
         streetViewControl: false,
         styles: [],
       },
+      infoOptions: {
+        minWidth: 200,
+        pixelOffset: {
+          width: 0,
+          height: -35,
+        },
+      },
+      infoWindowPos: null,
+      infoWinOpen: false,
+      marker: {},
+      markers: [
+        {
+          title: 'ここの情報みたいかな？',
+          position: { lat: 35.656519815124916, lng: 139.715925897229 },
+        },
+      ],
     }
-  },
-  created() {
-    this.getTodos()
-    this.subscribe()
   },
   async mounted() {
     const currentPosTmp = await this.getCurrentPosition()
@@ -60,30 +86,11 @@ export default {
         navigator.geolocation.getCurrentPosition(resolve, reject)
       })
     },
-    async createTodo() {
-      const { name } = this
-      if (!name) return false
-      const todo = { name }
-      await API.graphql({
-        query: createTodo,
-        variables: { input: todo },
-      })
-      this.name = ''
-    },
-    async getTodos() {
-      const todos = await API.graphql({
-        query: listTodos,
-      })
-      this.todos = todos.data.listTodos.items
-    },
-    subscribe() {
-      API.graphql({ query: onCreateTodo }).subscribe({
-        next: (eventData) => {
-          const todo = eventData.value.data.onCreateTodo
-          if (this.todos.some((item) => item.name === todo.name)) return
-          this.todos = [...this.todos, todo]
-        },
-      })
+    onClickMarker(index, marker) {
+      this.$refs.gmp.panTo(marker.position)
+      this.infoWindowPos = marker.position
+      this.marker = marker
+      this.infoWinOpen = true
     },
   },
 }
