@@ -1,6 +1,6 @@
 <template>
   <amplify-authenticator>
-    <h1>サンプル</h1>
+    <h1>東京ビーガンレストラン</h1>
     <v-row justify="center" align="center">
       <v-col cols="12" sm="8" md="6">
         <v-card>
@@ -30,6 +30,7 @@
               <p style="color: #000">
                 {{ marker.title }}
               </p>
+              <img src="~/assets/img/dango.jpg" width="200px" height="100px" />
             </GmapInfoWindow>
           </GmapMap>
         </v-card>
@@ -67,6 +68,7 @@ export default {
       markers: [
         {
           title: 'ここの情報みたいかな？',
+          url: '/assets/img/dango.jpg',
           position: { lat: 35.656519815124916, lng: 139.715925897229 },
         },
       ],
